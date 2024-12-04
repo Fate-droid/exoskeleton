@@ -1,0 +1,38 @@
+
+from coppeliasim_zmqremoteapi_client import RemoteAPIClient
+import time
+import math
+
+# Create a client to connect to the CoppeliaSim Remote API
+client = RemoteAPIClient()
+sim = client.getObject('sim')
+
+# Start the simulation
+print("Starting simulation...")
+sim.startSimulation()
+time.sleep(1)
+
+# Get the handle of the joint
+joint_handle = sim.getObjectHandle('joint32')
+
+# Check initial position of the joint
+initial_position = sim.getJointPosition(joint_handle)
+print(f"Initial position of joint {joint_handle}: {initial_position * 180 / math.pi}°")
+
+# Set the target torque for the joint and a target velocity to allow rotation
+target_torque = 10.0  # Set the desired torque
+target_velocity = 0.01  # Set a low target velocity (radians per second)
+sim.setJointTargetForce(joint_handle, target_torque)
+sim.setJointTargetVelocity(joint_handle, target_velocity)
+print(f"Target torque set to {target_torque} and velocity set to {target_velocity} for joint {joint_handle}")
+
+# Observe position changes over time
+for i in range(5):  # Check every 2 seconds for a total of 10 seconds
+    time.sleep(2)
+    position = sim.getJointPosition(joint_handle)
+    print(f"Position of joint {joint_handle} at time {i*2}s: {position * 180 / math.pi}°")
+
+# Stop the simulation
+print("Stopping simulation...")
+sim.stopSimulation()
+print("Simulation stopped.")
