@@ -33,18 +33,20 @@ q_dot = np.array([0.5, 0.5])  # [q1_dot, q2_dot]
 q_ddot = np.array([0.1, 0.1])  # [q1_ddot, q2_ddot]
 
 # Inertia matrix A(q)
-a11 = (m_h1 + m_e1) * l1**2 + (m_h2 + m_e2) * (l1**2 + l2**2 + 2 * l1 * l2 * np.cos(q2))
-a12 = (m_h2 + m_e2) * (l2**2 + l1 * l2 * np.cos(q2))
-a22 = (m_h2 + m_e2) * l2**2
-A = np.array([[a11, a12], [a12, a22]])
+a11 = (m_h1 + m_e1) * l1**2 + (m_h2 + m_e2) * (l1**2 + l2**2 + 2 * l1 * l2 * np.cos(q2)) + I1+I2
+a12 = (m_h2 + m_e2) * (l2**2 + l1 * l2 * np.cos(q2)) + I2
+a22 = (m_h2 + m_e2) * l2**2 + I2
+a21 = m2_total*(l2**2+l1*l2*np.cos(q2))+I2
+A = np.array([[a11, a12], [a21, a22]])
 
 # Coriolis and Centrifugal matrix B(q, q_dot)
 b12 = -(m_h2 + m_e2) * l1 * l2 * np.sin(q2) * q_dot[1]
 b21 = (m_h2 + m_e2) * l1 * l2 * np.sin(q2) * q_dot[0]
-B = np.array([[0, b12], [b21, 0]])
+b11 = -m2_total*(l1*l3*np.sin(q2))*q_dot[1]
+B = np.array([[b11, b12], [b21, 0]])
 
 # Gravity vector C(q)
-g1 = (m_h1 + m_e1) * l1 + (m_h2 + m_e2) * l2 * g * np.sin(q1)
+g1 = ((m_h1 + m_e1)*l1 + m2_total*l2)*g*np.sin(q1)+ (m_h2 + m_e2) * l2 * g * np.sin(q1+q2)
 g2 = (m_h2 + m_e2) * l2 * g * np.sin(q1 + q2)
 C = np.array([g1, g2])
 
